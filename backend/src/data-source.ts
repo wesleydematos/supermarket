@@ -2,6 +2,8 @@ import "dotenv/config";
 import "reflect-metadata";
 import { DataSource } from "typeorm";
 import { InitialMigration1693932883232 } from "./migrations/1693932883232-initialMigration";
+import Product from "./entities/Product";
+import Pack from "./entities/Pack";
 
 export const AppDataSource = new DataSource({
   type: "mysql",
@@ -11,7 +13,7 @@ export const AppDataSource = new DataSource({
   password: process.env.DBPASSWORD,
   database: process.env.DBNAME,
   logging: true,
-  entities: [],
+  entities: [Product, Pack],
   migrations: [InitialMigration1693932883232],
   subscribers: [],
 });
