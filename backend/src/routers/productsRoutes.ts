@@ -10,4 +10,4 @@ const multerConfig = multer();
 export const productsRouter = Router();
 
 productsRouter.get("", listProductsController);
-productsRouter.patch("", multerConfig.single("file"), updateProductController);
+productsRouter.post("", multerConfig.single("file"), updateProductController);

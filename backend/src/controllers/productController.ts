@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 
 import { listProductsService } from "../services/products/listProductsService";
-import { updateProductsService } from "../services/products/updateProductsService";
+import { verifyProductsService } from "../services/products/updateProductsService";
 
 export const listProductsController = async (_req: Request, res: Response) => {
   const allProducts = await listProductsService();
@@ -10,6 +10,6 @@ export const listProductsController = async (_req: Request, res: Response) => {
 
 export const updateProductController = async (req: Request, res: Response) => {
   const buffer = req.file.buffer;
-  const updatedProducts = await updateProductsService(buffer);
+  const updatedProducts = await verifyProductsService(buffer);
   return res.json(updatedProducts);
 };

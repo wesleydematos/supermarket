@@ -5,4 +5,12 @@ interface IProducts {
   sales_price: number;
 }
 
-export default IProducts;
+interface IProduct {
+  code: number;
+  name: string;
+  last_price: number;
+  new_price: number;
+  errors: string[];
+}
+
+export { IProducts, IProduct };

@@ -1,10 +1,13 @@
 import { Readable } from "stream";
 import readline from "readline";
-// import Product from "../../entities/Product";
 import { ensuseProductFieldsExist } from "../../helpers/ensureFieldsExist";
 import { ensuseProductCodeExist } from "../../helpers/ensuseProductCodeExist";
+import { ensureIsValidPrice } from "../../helpers/ensureIsValidPrice";
+import { IProduct } from "../../interfaces/IProducts";
 
-export const updateProductsService = async (buffer: Buffer): Promise<any> => {
+export const verifyProductsService = async (
+  buffer: Buffer
+): Promise<IProduct[] | object> => {
   const readableFile = new Readable();
   readableFile.push(buffer);
   readableFile.push(null);
@@ -13,12 +16,14 @@ export const updateProductsService = async (buffer: Buffer): Promise<any> => {
     input: readableFile,
   });
 
-  const products = [];
+  const products: IProduct[] = [];
 
   let firstInteraction = true;
 
   for await (let line of productsLine) {
     const productLineSplit = line.split(",");
+    const code = Number(productLineSplit[0]);
+    const sales_price = Number(productLineSplit[1]);
 
     if (firstInteraction) {
       const fieldsExist = ensuseProductFieldsExist(productLineSplit);
@@ -32,18 +37,26 @@ export const updateProductsService = async (buffer: Buffer): Promise<any> => {
       continue;
     }
 
-    const product: any = {
-      code: Number(productLineSplit[0]),
-      sales_price: Number(productLineSplit[1]),
+    const product: IProduct = {
+      code: code,
+      name: "",
+      last_price: 0,
+      new_price: sales_price,
       errors: [],
     };
 
-    const inexistentProduct = await ensuseProductCodeExist(
-      Number(productLineSplit[0])
-    );
+    const productEsxist = await ensuseProductCodeExist(code);
 
-    if (inexistentProduct) {
-      product.errors.push("Código inexistente.");
+    if (productEsxist) {
+      product.name = productEsxist.name;
+      product.last_price = Number(productEsxist.sales_price);
+    } else {
+      product.errors.push("Código de produto inexistente.");
+    }
+
+    const invalidPrice = await ensureIsValidPrice(sales_price, code);
+    if (invalidPrice.length) {
+      product.errors.push(...invalidPrice);
     }
 
     products.push(product);
