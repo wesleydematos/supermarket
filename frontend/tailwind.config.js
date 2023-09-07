@@ -9,7 +9,14 @@ export default {
   },
   theme: {
     extend: {
-      colors: {},
+      colors: {
+        header: "#1E2044",
+        primary: "#060937",
+        secondary: "#0DAB77",
+        tertiary: "#00B780",
+        error: "#f44336",
+        sucess: "#4caf50",
+      },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "gradient-conic":
