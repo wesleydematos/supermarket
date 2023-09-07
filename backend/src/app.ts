@@ -1,4 +1,3 @@
-import "express-async-errors";
 import express, { Application } from "express";
 import cors from "cors";
 import { productsRouter } from "./routers/productsRoutes";
