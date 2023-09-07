@@ -1,11 +1,11 @@
 import "express-async-errors";
 import express, { Application } from "express";
 import cors from "cors";
-import routers from "./routers/routes";
+import { productsRouter } from "./routers/productsRoutes";
 
 const app: Application = express();
 app.use(express.json());
 app.use(cors());
-app.use(routers);
+app.use("/products", productsRouter);
 
 export default app;
