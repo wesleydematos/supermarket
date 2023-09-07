@@ -1,10 +1,11 @@
 import { Readable } from "stream";
 import readline from "readline";
 import Product from "../../entities/Product";
+import { ensuseProductFieldsExist } from "../../helpers/ensureFieldsExist";
 
 export const updateProductsService = async (
   buffer: Buffer
-): Promise<Product[]> => {
+): Promise<Product[] | object> => {
   const readableFile = new Readable();
   readableFile.push(buffer);
   readableFile.push(null);
@@ -21,8 +22,13 @@ export const updateProductsService = async (
     const productLineSplit = line.split(",");
 
     if (firstInteraction) {
-      // console.log(productLineSplit);
-      // [ 'product_code', 'new_price' ]
+      const fieldsExist = ensuseProductFieldsExist(productLineSplit);
+      if (!fieldsExist) {
+        return {
+          message:
+            "O arquivo deve conter os campos 'product_code' e 'new_price'.",
+        };
+      }
       firstInteraction = false;
       continue;
     }
