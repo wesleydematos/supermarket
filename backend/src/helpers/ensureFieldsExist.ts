@@ -1,4 +1,4 @@
-const ensuseProductFieldsExist = (fields: string[]) => {
+const ensuseProductFieldsExist = (fields: string[]): void | boolean => {
   const totalFields = fields.length == 2;
   const containsFields =
     fields.includes("new_price") && fields.includes("product_code");

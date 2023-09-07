@@ -1,11 +1,10 @@
 import { Readable } from "stream";
 import readline from "readline";
-import Product from "../../entities/Product";
+// import Product from "../../entities/Product";
 import { ensuseProductFieldsExist } from "../../helpers/ensureFieldsExist";
+import { ensuseProductCodeExist } from "../../helpers/ensuseProductCodeExist";
 
-export const updateProductsService = async (
-  buffer: Buffer
-): Promise<Product[] | object> => {
+export const updateProductsService = async (buffer: Buffer): Promise<any> => {
   const readableFile = new Readable();
   readableFile.push(buffer);
   readableFile.push(null);
@@ -33,10 +32,21 @@ export const updateProductsService = async (
       continue;
     }
 
-    products.push({
+    const product: any = {
       code: Number(productLineSplit[0]),
       sales_price: Number(productLineSplit[1]),
-    });
+      errors: [],
+    };
+
+    const inexistentProduct = await ensuseProductCodeExist(
+      Number(productLineSplit[0])
+    );
+
+    if (inexistentProduct) {
+      product.errors.push("Código inexistente.");
+    }
+
+    products.push(product);
   }
 
   return products;
