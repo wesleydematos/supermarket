@@ -1,13 +1,9 @@
 import { Readable } from "stream";
 import readline from "readline";
-import { ensuseProductFieldsExist } from "../../helpers/ensureFieldsExist";
-import { ensuseProductCodeExist } from "../../helpers/ensuseProductCodeExist";
-import { ensureIsValidPrice } from "../../helpers/ensureIsValidPrice";
-import { IProduct } from "../../interfaces/IProducts";
+import { AppDataSource } from "../../data-source";
+import Product from "../../entities/Product";
 
-export const verifyProductsService = async (
-  buffer: Buffer
-): Promise<IProduct[] | object> => {
+export const updateProductsService = async (buffer: Buffer) => {
   const readableFile = new Readable();
   readableFile.push(buffer);
   readableFile.push(null);
@@ -16,7 +12,7 @@ export const verifyProductsService = async (
     input: readableFile,
   });
 
-  const products: IProduct[] = [];
+  const productsRepository = AppDataSource.getRepository(Product);
 
   let firstInteraction = true;
 
@@ -26,41 +22,18 @@ export const verifyProductsService = async (
     const sales_price = Number(productLineSplit[1]);
 
     if (firstInteraction) {
-      const fieldsExist = ensuseProductFieldsExist(productLineSplit);
-      if (!fieldsExist) {
-        return {
-          message:
-            "O arquivo deve conter os campos 'product_code' e 'new_price'.",
-        };
-      }
       firstInteraction = false;
       continue;
     }
 
-    const product: IProduct = {
-      code: code,
-      name: "",
-      last_price: 0,
-      new_price: sales_price,
-      errors: [],
-    };
+    const productToUpdate = await productsRepository.findOneBy({ code: code });
+    const updatedProduct = productsRepository.create({
+      ...productToUpdate,
+      sales_price: sales_price,
+    });
 
-    const productEsxist = await ensuseProductCodeExist(code);
-
-    if (productEsxist) {
-      product.name = productEsxist.name;
-      product.last_price = Number(productEsxist.sales_price);
-    } else {
-      product.errors.push("Código de produto inexistente.");
-    }
-
-    const invalidPrice = await ensureIsValidPrice(sales_price, code);
-    if (invalidPrice.length) {
-      product.errors.push(...invalidPrice);
-    }
-
-    products.push(product);
+    await productsRepository.save(updatedProduct);
   }
 
-  return products;
+  return { message: "Products updated!" };
 };

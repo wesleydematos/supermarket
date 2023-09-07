@@ -1,15 +1,22 @@
 import { Request, Response } from "express";
 
 import { listProductsService } from "../services/products/listProductsService";
-import { verifyProductsService } from "../services/products/updateProductsService";
+import { updateProductsService } from "../services/products/updateProductsService";
+import { verifyProductsService } from "../services/products/verifyProductsService";
 
 export const listProductsController = async (_req: Request, res: Response) => {
   const allProducts = await listProductsService();
   return res.json(allProducts);
 };
 
-export const updateProductController = async (req: Request, res: Response) => {
+export const verifyProductController = async (req: Request, res: Response) => {
   const buffer = req.file.buffer;
-  const updatedProducts = await verifyProductsService(buffer);
-  return res.json(updatedProducts);
+  const verifiedProducts = await verifyProductsService(buffer);
+  return res.json(verifiedProducts);
+};
+
+export const updateProductsController = async (req: Request, res: Response) => {
+  const buffer = req.file.buffer;
+  const resp = await updateProductsService(buffer);
+  return res.status(200).json(resp);
 };
