@@ -1,10 +1,16 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { NavBar } from "./components/Navbar/index.jsx";
+import { App } from "./App.jsx";
 import "./index.css";
+import { BrowserRouter } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.min.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <NavBar />
+    <BrowserRouter>
+      <ToastContainer autoClose={2000} theme="dark" />
+      <App />
+    </BrowserRouter>
   </React.StrictMode>
 );
