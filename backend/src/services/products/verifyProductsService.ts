@@ -1,32 +1,17 @@
-import { Readable } from "stream";
-import readline from "readline";
 import { ensuseProductFieldsExist } from "../../helpers/ensureFieldsExist";
 import { ensuseProductCodeExist } from "../../helpers/ensuseProductCodeExist";
 import { ensureIsValidPrice } from "../../helpers/ensureIsValidPrice";
 import { IProduct } from "../../interfaces/IProducts";
 
 export const verifyProductsService = async (
-  buffer: Buffer
+  data: []
 ): Promise<IProduct[] | object> => {
-  const readableFile = new Readable();
-  readableFile.push(buffer);
-  readableFile.push(null);
-
-  const productsLine = readline.createInterface({
-    input: readableFile,
-  });
-
   const products: IProduct[] = [];
-
   let firstInteraction = true;
 
-  for await (let line of productsLine) {
-    const productLineSplit = line.split(",");
-    const code = Number(productLineSplit[0]);
-    const sales_price = Number(productLineSplit[1]);
-
+  for await (let line of data) {
     if (firstInteraction) {
-      const fieldsExist = ensuseProductFieldsExist(productLineSplit);
+      const fieldsExist = ensuseProductFieldsExist(line);
       if (!fieldsExist) {
         return {
           message:
@@ -36,6 +21,9 @@ export const verifyProductsService = async (
       firstInteraction = false;
       continue;
     }
+
+    const code = Number(line[0]);
+    const sales_price = Number(line[1]);
 
     const product: IProduct = {
       code: code,

@@ -10,8 +10,8 @@ export const listProductsController = async (_req: Request, res: Response) => {
 };
 
 export const verifyProductController = async (req: Request, res: Response) => {
-  const buffer = req.file.buffer;
-  const verifiedProducts = await verifyProductsService(buffer);
+  const data = req.body;
+  const verifiedProducts = await verifyProductsService(data);
   return res.json(verifiedProducts);
 };
 
