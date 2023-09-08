@@ -20,11 +20,15 @@ export const ProductsTable = () => {
         await api
           .post("/products", results.data)
           .then((response) => {
-            response.data.forEach((element) => {
-              if (element.errors.length > 0) {
-                setIsDataValid(false);
-              }
-            });
+            if (Array.isArray(response.data)) {
+              response.data.forEach((element) => {
+                if (element.errors.length > 0) {
+                  setIsDataValid(false);
+                }
+              });
+            } else {
+              setIsDataValid(false);
+            }
             setData(response.data);
           })
           .catch((error) => {
@@ -48,10 +52,13 @@ export const ProductsTable = () => {
     getProducts();
   }, []);
   return (
-    <main>
+    <main className="flex flex-col items-center mb-3">
       {products.length ? (
         <>
-          <table>
+          <h1 className="text-primary font-bold text-xl my-4">
+            Todos os produtos:
+          </h1>
+          <table className="bg-slate-100 rounded-md xl:w-[800px] mb-4">
             <thead>
               <tr>
                 <th>Código</th>
@@ -72,8 +79,11 @@ export const ProductsTable = () => {
             </tbody>
           </table>
 
-          <section className="py-3 md:py-5">
-            <label htmlFor="uploadFile" className="font-bold">
+          <section className="p-0 flex flex-col items-center">
+            <label
+              htmlFor="uploadFile"
+              className="font-bold text-secondary text-xl my-4"
+            >
               Atualizar produtos
             </label>
 
@@ -83,6 +93,17 @@ export const ProductsTable = () => {
               accept=".csv"
               onChange={handleFile}
             />
+
+            {!isDataValid ? <div>Erros</div> : <div>Acertos</div>}
+
+            {file.length && (
+              <button
+                className="bg-blue-500 hover:bg-blue-700 rounded-md disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer mt-3 px-3 font-medium text-white"
+                disabled={!isDataValid}
+              >
+                ATUALIZAR
+              </button>
+            )}
           </section>
         </>
       ) : (
