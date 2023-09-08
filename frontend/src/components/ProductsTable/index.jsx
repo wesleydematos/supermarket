@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useState } from "react";
 import { api } from "../../services/api";
 import { toast } from "react-toastify";
@@ -9,6 +9,15 @@ export const ProductsTable = () => {
   const [data, setData] = useState([]);
   const [file, setFile] = useState([]);
   const [isDataValid, setIsDataValid] = useState(true);
+  const [updated, setUpdated] = useState(false);
+  const inputFileRef = useRef(null);
+
+  const handleClearFile = () => {
+    setFile([]);
+    if (inputFileRef.current) {
+      inputFileRef.current.value = null;
+    }
+  };
 
   function handleFile(e) {
     setIsDataValid(true);
@@ -39,8 +48,19 @@ export const ProductsTable = () => {
     });
   }
 
-  function updateProducts() {
-    console.log(data);
+  async function updateProducts() {
+    await api
+      .patch("/products", file)
+      .then((response) => {
+        toast.success(response.data.message);
+        setUpdated(!updated);
+        setData([]);
+        setIsDataValid(true);
+        handleClearFile();
+      })
+      .catch((error) => {
+        console.error("Erro:", error);
+      });
   }
 
   useEffect(() => {
@@ -54,7 +74,7 @@ export const ProductsTable = () => {
     }
 
     getProducts();
-  }, []);
+  }, [updated]);
 
   return (
     <main className="flex flex-col items-center mb-3">
@@ -93,6 +113,7 @@ export const ProductsTable = () => {
             </label>
 
             <input
+              ref={inputFileRef}
               id="uploadFile"
               type="file"
               accept=".csv"
@@ -180,7 +201,7 @@ export const ProductsTable = () => {
           </section>
         </>
       ) : (
-        <h2>Nenhum produto encontrado :/</h2>
+        <h2 className="mt-5 font-bold">Nenhum produto encontrado :/</h2>
       )}
     </main>
   );
