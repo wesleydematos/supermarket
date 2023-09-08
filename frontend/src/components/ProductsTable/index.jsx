@@ -39,6 +39,10 @@ export const ProductsTable = () => {
     });
   }
 
+  function updateProducts() {
+    console.log(data);
+  }
+
   useEffect(() => {
     async function getProducts() {
       try {
@@ -51,6 +55,7 @@ export const ProductsTable = () => {
 
     getProducts();
   }, []);
+
   return (
     <main className="flex flex-col items-center mb-3">
       {products.length ? (
@@ -58,7 +63,7 @@ export const ProductsTable = () => {
           <h1 className="text-primary font-bold text-xl my-4">
             Todos os produtos:
           </h1>
-          <table className="bg-slate-100 rounded-md xl:w-[800px] mb-4">
+          <table className="bg-slate-100 rounded-md xl:w-[800px] mb-4 border border-header border-solid mx-1">
             <thead>
               <tr>
                 <th>Código</th>
@@ -94,12 +99,80 @@ export const ProductsTable = () => {
               onChange={handleFile}
             />
 
-            {!isDataValid ? <div>Erros</div> : <div>Acertos</div>}
+            {isDataValid && data.length && (
+              <div>
+                <h3 className="text-primary font-bold text-xl my-4 ">
+                  Confirme as mudanças:
+                </h3>
+                <table className="bg-slate-100 rounded-md xl:w-[800px] mb-4 border border-teal-500 border-solid mx-1">
+                  <thead>
+                    <tr>
+                      <th>Código</th>
+                      <th>Nome</th>
+                      <th>Preço atual</th>
+                      <th>Novo preço</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {data.map((product) => (
+                      <tr key={product.code}>
+                        <td>{product.code}</td>
+                        <td>{product.name}</td>
+                        <td>{product.last_price}</td>
+                        <td>{product.new_price}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+            {!isDataValid && (
+              <div>
+                {data.message ? (
+                  <div>
+                    <h3 className="font-bold text-xl my-3 text-center text-red-400">
+                      {data.message}
+                    </h3>
+                  </div>
+                ) : (
+                  <div>
+                    <h3 className="text-primary font-bold text-xl my-4 ">
+                      Ajuste os erros:
+                    </h3>
+                    <div className="bg-slate-100 rounded-md mb-4 border border-red-500 border-solid mx-1">
+                      {data.map((product) => (
+                        <>
+                          {product.errors.length > 0 ? (
+                            <div key={product.code} className="m-2">
+                              <p className="font-medium">
+                                O novo preço de R${product.new_price} para o
+                                produto {product.name} de código {product.code}{" "}
+                                não pode ser alterado devido os seguintes erros:
+                              </p>
+                              {product.errors.map((erro) => (
+                                <p key={erro}>- {erro}</p>
+                              ))}
+                            </div>
+                          ) : product.name.length ? null : (
+                            <p key={product.code} className="m-2 font-medium">
+                              Os dados referentes ao produto de código{" "}
+                              {product.code} não podem ser alterados pois o
+                              mesmo não existe.
+                            </p>
+                          )}
+                        </>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
 
             {file.length && (
               <button
                 className="bg-blue-500 hover:bg-blue-700 rounded-md disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer mt-3 px-3 font-medium text-white"
                 disabled={!isDataValid}
+                onClick={() => updateProducts()}
               >
                 ATUALIZAR
               </button>
