@@ -16,7 +16,7 @@ export const verifyProductController = async (req: Request, res: Response) => {
 };
 
 export const updateProductsController = async (req: Request, res: Response) => {
-  const buffer = req.file.buffer;
-  const resp = await updateProductsService(buffer);
-  return res.status(200).json(resp);
+  const data = req.body;
+  const response = await updateProductsService(data);
+  return res.status(200).json(response);
 };
