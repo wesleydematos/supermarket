@@ -12,15 +12,21 @@ export const listPacksService = async (): Promise<IPacks[]> => {
   const alteredPacks = await Promise.all(
     packs.map(async (pack) => {
       const product_id = Number(pack.product_id);
+      const kit_id = Number(pack.pack_id);
 
       const product = await productsRepository.findOne({
         where: { code: product_id },
       });
 
+      const kit = await productsRepository.findOne({
+        where: { code: kit_id },
+      });
+
       return {
         ...pack,
+        kit_name: kit.name,
+        product_price: kit.sales_price,
         product_name: product.name,
-        product_price: product.sales_price,
       };
     })
   );
